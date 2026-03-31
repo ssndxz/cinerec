@@ -12,7 +12,7 @@ export const Login = () => {
       const { data } = await apiService.login({ email, password });
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
-      window.location.href = '/';
+      window.location.href = import.meta.env.BASE_URL;
     } catch { alert('Ошибка входа! Проверьте данные.'); }
   };
 

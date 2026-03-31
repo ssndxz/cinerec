@@ -9,13 +9,4 @@ export default defineConfig({
     tailwindcss(),
   ],
   base: "/cinerec",
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://cinerec-production-9d02.up.railway.app',
-        changeOrigin: true,
-        secure: false,
-      }
-    }
-  }
 })

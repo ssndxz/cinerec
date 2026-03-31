@@ -11,11 +11,11 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    window.location.href = '/';
+    window.location.href = import.meta.env.BASE_URL;
   };
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <nav className="flex justify-between items-center p-6 bg-slate-900 sticky top-0 z-50 shadow-md">
         <div className="flex gap-8 items-center">
           <Link to="/" className="text-2xl font-black text-blue-500">

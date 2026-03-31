@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/v1';
+const API_URL = 'https://cinerec-production-9d02.up.railway.app/api/v1';
 
 export const api = axios.create({ baseURL: API_URL });
 
