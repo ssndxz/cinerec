@@ -29,5 +29,19 @@ export interface RecommendationItem {
   movie_id: number;
   title: string | null;
   score: number | null;
-  source: string;
+  source: 'trending' | 'content' | 'collaborative' | 'hybrid';
+  poster_url: string | null;
+}
+
+export interface WatchlistItem {
+  movie_id: number;
+  added_at: string;
+  movie: {
+    id: number;
+    title: string;
+    genres: string[];
+    year: number | null;
+    rating: number | null;
+    poster_url: string | null;
+  };
 }

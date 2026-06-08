@@ -15,22 +15,12 @@ export const Profile = () => {
         setUserData(userRes.data);
 
         const watchRes = await apiService.getMyWatchlist();
-        const items = watchRes.data || [];
+        const items = watchRes.data.items || [];
         
-        const fullMovies = await Promise.all(
-          items.map(async (item: any) => {
-            try { 
-              return (await apiService.getMovie(item.movie_id || item.id)).data; 
-            } catch { 
-              return item; 
-            }
-          })
-        );
-        
-        setWatchlist(fullMovies.reverse()); 
+        setWatchlist(items); 
 
       } catch (err) {
-        console.error("Ошибка загрузки данных профиля", err);
+        console.error("Error fetching profile data:", err);
       } finally {
         setLoading(false);
       }
@@ -39,14 +29,23 @@ export const Profile = () => {
     fetchData();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const refresh = localStorage.getItem('refresh_token');
+    if (refresh) {
+      try {
+        await apiService.logout(refresh);
+      } catch (err) {
+        console.error("Error deactivating session on server:", err);
+      }
+    }
+    
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     window.location.href = import.meta.env.BASE_URL; 
   };
 
-  if (loading) return <div className="text-center mt-20 text-slate-400">Загрузка профиля...</div>;
-  if (!userData) return <div className="text-center mt-20 text-red-400">Пожалуйста, войдите в систему.</div>;
+  if (loading) return <div className="text-center mt-20 text-slate-400">Loading profile...</div>;
+  if (!userData) return <div className="text-center mt-20 text-red-400">Please log in to your account.</div>;
 
   return (
     <div className="max-w-7xl mx-auto p-6 mt-10">
@@ -66,7 +65,7 @@ export const Profile = () => {
 
           <div className="flex gap-4 mb-10 text-sm bg-slate-900/50 py-3 px-6 rounded-xl border border-slate-700/50 justify-center md:justify-start">
             <span className="flex items-center gap-1 text-emerald-400">
-              <CheckCircle size={16} /> Активный аккаунт
+              <CheckCircle size={16} /> Active account
             </span>
           </div>
 
@@ -74,7 +73,7 @@ export const Profile = () => {
             onClick={handleLogout}
             className="flex items-center justify-center gap-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 px-8 py-3 rounded-xl font-bold transition w-full md:w-auto">
             <LogOut size={20} />
-            Выйти из системы
+            Log Out
           </button>
         </div>
       </div>
@@ -82,18 +81,18 @@ export const Profile = () => {
       <div>
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3 border-b border-slate-800 pb-4">
           <Bookmark className="text-blue-500" fill="currentColor" size={32} />
-          Мой список
+          My Watchlist
         </h2>
 
         {watchlist.length === 0 ? (
           <div className="text-center bg-slate-800/50 border border-slate-700 border-dashed rounded-2xl p-12">
-            <p className="text-slate-400 text-lg mb-4">В вашем списке пока нет фильмов.</p>
-            <p className="text-slate-500">Добавляйте фильмы в закладки, чтобы посмотреть их позже!</p>
+            <p className="text-slate-400 text-lg mb-4">Your watchlist is currently empty.</p>
+            <p className="text-slate-500">Add movies to your watchlist to view them later!</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {watchlist.map(movie => (
-              <MovieCard key={movie.id || movie.movie_id} movie={movie} />
+            {watchlist.map(item => (
+              <MovieCard key={item.movie_id} movie={item} />
             ))}
           </div>
         )}
